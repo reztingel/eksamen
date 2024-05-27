@@ -7,20 +7,12 @@
     <button onclick="sokBoker()">Søk</button>
 </div>
 <div>
-    <h2>Legg til ny bok</h2>
-    <form id="leggTilBokForm">
-        <input type="text" id="tittel" placeholder="Tittel" required>
-        <input type="text" id="forfatter" placeholder="Forfatter" required>
-        <input type="text" id="isbn" placeholder="ISBN" required>
-        <input type="number" id="nummer" placeholder="Nummer" required>
-        <button type="submit">Legg til bok</button>
-    </form>
-</div>
-<div>
     <h2>Bøker</h2>
-    <ul id="bokListe"></ul>
+    <ul id="bokListe">
+       
+    </ul>
 </div>
-<script src="/js/hoved.js"></script>
+<script src="{{ url_for(filename='js/main.js') }}"></script>
 
 
-{% enblock %}
+{% endblock %}
