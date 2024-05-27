@@ -73,4 +73,4 @@ def legg_til_bok():
     return jsonify({'resultat': f"{data['tittel']} ble registrert"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
