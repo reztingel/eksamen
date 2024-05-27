@@ -19,8 +19,8 @@ class Bok(db.Model):
             'id': self.id,
             'Tittel': self.tittel,
             'Forfatter': self.forfatter,
-            'ISBN': self.isbn,
-            'nummer': self.nummer
+            'nummer': self.nummer,
+            'ISBN': self.isbn
         }
     
 with app.app_context():
