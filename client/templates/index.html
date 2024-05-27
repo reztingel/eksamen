@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Bibliotek</h1>
+<div>
+    <input type="text" id="sokInput" placeholder="Søk etter tittel eller forfatter...">
+    <button onclick="sokBoker()">Søk</button>
+</div>
+<div>
+    <h2>Legg til ny bok</h2>
+    <form id="leggTilBokForm">
+        <input type="text" id="tittel" placeholder="Tittel" required>
+        <input type="text" id="forfatter" placeholder="Forfatter" required>
+        <input type="text" id="isbn" placeholder="ISBN" required>
+        <input type="number" id="nummer" placeholder="Nummer" required>
+        <button type="submit">Legg til bok</button>
+    </form>
+</div>
+<div>
+    <h2>Bøker</h2>
+    <ul id="bokListe"></ul>
+</div>
+<script src="/js/hoved.js"></script>
+
+
+{% enblock %}
