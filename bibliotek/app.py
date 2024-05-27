@@ -12,15 +12,15 @@ class Bok(db.Model):
     tittel = db.Column(db.String(120), nullable=False)
     forfatter = db.Column(db.String(120), nullable=False)
     isbn = db.Column(db.String(13), nullable=False)
-    nummer = db.Column(db.Integer, unique=True, nullable=False)
+    strekkode = db.Column(db.Text, nullable=False)
 
     def to_dict(self):
         return {
             'id': self.id,
-            'tittel': self.tittel,
-            'forfatter': self.forfatter,
-            'isbn': self.isbn,
-            'nummer': self.nummer
+            'Tittel': self.tittel,
+            'Forfatter': self.forfatter,
+            'ISBN': self.isbn,
+            'Strekkode': self.strekkode
         }
     
 with app.app_context():
