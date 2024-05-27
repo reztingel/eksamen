@@ -33,7 +33,7 @@ def import_books_from_csv(csv_file_path):
                 db.session.commit()
 
 if __name__ == '__main__':
-    csv_file_path = 'C:/Users/Ton/OneDrive - Innlandet fylkeskommune/Skrivebord/eksamen/bibliotek/bøker.csv'
+    csv_file_path = 'C:\\Users\\tobia\\Desktop\\eksamen\\bibliotek\\bøker.csv'
     import_books_from_csv(csv_file_path)
 
 
