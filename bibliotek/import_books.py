@@ -2,12 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from app import Bok  
 
+
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
 def import_books_from_csv(csv_file_path):
-    with open(csv_file_path, 'r') as file:
+    with open(csv_file_path, 'r', encoding="utf-8") as file:
         next(file)
         
         for line in file:
@@ -18,8 +20,8 @@ def import_books_from_csv(csv_file_path):
             book = Bok(
                 tittel=tittel,
                 forfatter=forfatter,
-                isbn=isbn,
-                nummer=nummer
+                nummer=nummer,
+                isbn=isbn
             )
 
     
