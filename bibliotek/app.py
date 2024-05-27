@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite.///'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
 
@@ -23,11 +23,12 @@ class Bok(db.Model):
             'nummer': self.nummer
         }
     
-db.create_all()
+with app.app_context():
+    db.create_all()
 
 
 
-@app.route('/boker', methods=['GET'])
+@app.route('/', methods=['GET'])
 def get_boker():
     boker = Bok.query.all()
     return jsonify([bok.to_dict() for bok in boker])
@@ -72,4 +73,4 @@ def legg_til_bok():
     return jsonify({'resultat': f"{data['tittel']} ble registrert"})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True)
