@@ -22,7 +22,7 @@ function fetchBooks() {
         });
 }
 
-function searchBooks() {
+function sokBoker() {
     const searchInput = document.getElementById('searchInput').value;
     fetch(`/api/books?filter=${searchInput}`)
         .then(response => response.json())
@@ -41,7 +41,7 @@ function searchBooks() {
         });
 }
 
-function addBook(event) {
+function leggTilBok(event) {
     event.preventDefault();
     const title = document.getElementById('title').value;
     const author = document.getElementById('author').value;
@@ -65,7 +65,7 @@ function addBook(event) {
     });
 }
 
-function viewBook(id) {
+function visBok(id) {
     window.location.href = `book.html?id=${id}`;
 }
 
