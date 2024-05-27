@@ -1,29 +1,44 @@
-import csv
-import sqlite3  # eller en annen databaseconnector du bruker
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from app import Bok  
 
-# Tilpass tilkoblingen til din database
-conn = sqlite3.connect('database.db')
-cursor = conn.cursor()
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+db = SQLAlchemy(app)
 
-# Opprett tabellen hvis den ikke eksisterer
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS books (
-    id INTEGER PRIMARY KEY,
-    tittel TEXT NOT NULL,
-    forfatter TEXT NOT NULL,
-    isbn TEXT NOT NULL,
-    nummer INTEGER NOT NULL
-)
-''')
+def import_books_from_csv(csv_file_path):
+    with open(csv_file_path, 'r') as file:
+        next(file)
+        
+        for line in file:
+            data = line.strip().split(',')
+            tittel, forfatter, isbn, strekkode = data
 
-# Les og importer CSV-filen
-with open('bøker.csv', newline='') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        cursor.execute('''
-        INSERT INTO books (tittel, forfatter, isbn, nummer)
-        VALUES (?, ?, ?, ?)
-        ''', (row['tittel'], row['forfatter'], row['isbn'], row['nummer']))
+            
+            try:
+                strekkode = int(strekkode)
+            except ValueError:
+                print(f"Ugyldig strekkode: {strekkode}. Hopper over denne boken.")
+                continue
 
-conn.commit()
-conn.close()
+    
+            book = Bok(
+                tittel=tittel,
+                forfatter=forfatter,
+                isbn=isbn,
+                strekkode=strekkode
+            )
+
+    
+            with app.app_context():
+                db.create_all()
+
+                
+                db.session.add(book)
+                db.session.commit()
+
+if __name__ == '__main__':
+    csv_file_path = 'C:/Users/Ton/OneDrive - Innlandet fylkeskommune/Skrivebord/eksamen/bibliotek/bøker.csv'
+    import_books_from_csv(csv_file_path)
+
+
