@@ -12,7 +12,7 @@ class Bok(db.Model):
     tittel = db.Column(db.String(120), nullable=False)
     forfatter = db.Column(db.String(120), nullable=False)
     isbn = db.Column(db.String(13), nullable=False)
-    strekkode = db.Column(db.Text, nullable=False)
+    nummer = db.Column(db.Integer, unique=True, nullable=False)
 
     def to_dict(self):
         return {
@@ -20,7 +20,7 @@ class Bok(db.Model):
             'Tittel': self.tittel,
             'Forfatter': self.forfatter,
             'ISBN': self.isbn,
-            'Strekkode': self.strekkode
+            'nummer': self.nummer
         }
     
 with app.app_context():
