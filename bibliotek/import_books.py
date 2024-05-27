@@ -12,21 +12,14 @@ def import_books_from_csv(csv_file_path):
         
         for line in file:
             data = line.strip().split(',')
-            tittel, forfatter, isbn, strekkode = data
-
-            
-            try:
-                strekkode = int(strekkode)
-            except ValueError:
-                print(f"Ugyldig strekkode: {strekkode}. Hopper over denne boken.")
-                continue
+            tittel, forfatter, isbn, nummer = data
 
     
             book = Bok(
                 tittel=tittel,
                 forfatter=forfatter,
                 isbn=isbn,
-                strekkode=strekkode
+                nummer=nummer
             )
 
     
