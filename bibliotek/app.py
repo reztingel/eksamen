@@ -41,46 +41,82 @@ def index():
 
 @app.route('/book/<nummer>', methods=['GET'])
 def get_book(nummer):
-    book = Bok.query.filter_by(nummer=nummer).first()
-    if book:
-        return jsonify(book.to_dict())
-    else:
-        return jsonify({'error': 'Book not found'}), 404
+    try:
+        cur.execute("SELECT * FROM bøker WHERe nummer = ?", (nummer,))
+        book = cur.fetchone()
+        if book[0] is None:
+            return {"error": "fant ikke boken"}, 404
+        response = {
+            "tittel": book[0],
+            "forfatter": book[1],
+            "isbn": book[2],
+            "nummer": nummer
+        }
+        return response, 200
+    except sqlite3.Error as e:
+        return {"error": str(e)}, 500
 
 
+@app.route("/filter/<streng>", methods=["GET"])
+def filter(streng):
+    try:
 
-@app.route('/filter/<string:streng>', methods=['GET'])
-def filter_boker(streng):
-    boker = Bok.query.filter((Bok.tittel.contains(streng)) | (Bok.forfatter.contains(streng))).all()
-    return jsonify([bok.to_dict() for bok in boker])
+        cur.execute("SELECT * FROM bøker WHERE tittel LIKE ? OR forfatter LIKE ?",(f"%{streng}%", f"%{streng}%"),)
+        bøker = cur.fetchall()
+        if not bøker:
+            return {"melding": f"Fant ingen bøker etter søkerordet: {streng}"}, 404
+        response = []
+        for book in bøker:
+            response.append(
+                {"tittel": book[0],
+                "forfatter": book[1],
+                "isbn": book[2],
+                "nummer": book[3]
+                }
+            )
+        return response,200
+    except sqlite3.Error as e:
+        return {"error": str(e)},500
 
-
-@app.route('/slettbok/<int:nummer>', methods=['DELETE'])
-def delete_bok(nummer):
-    bok = Bok.query.filter_by(nummer=nummer).first()
-    if bok:
-        db.session.delete(bok)
-        db.session.commit()
-        return jsonify({'resultat': 'Boken ble slettet fra databasen'})
-    else:
-        return jsonify({'resultat': 'Boken finnes ikke i databasen'}), 404
+@app.route('/slettbook/<int:nummer>', methods=['DELETE'])
+def slettbook(nummer):
+    try:
+        cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer))
+        row = cur.fetchone()
+        if row[0] is None:
+            return {"melding": "boke finnes ikke i databasen"}, 404
+        cur.execute("UPDATE bøker SET tittel = NULL, forfatter = NULL, isbn = NULL WHERE nummer = ?",
+                    (nummer,)
+        )
+        con.commit()
+        return{"melding": "boken ble slettet fra databasen"}, 200
+    except sqlite3.Error as e:
+        return{"error": str(e)},500
+    
 
 
 @app.route('/leggtilbok', methods=['POST'])
 def legg_til_bok():
-    data = request.json
-    eksisterende_bok = Bok.query.filter_by(nummer=data['nummer']).first()
-    if eksisterende_bok:
-        return jsonify({'resultat': 'Boken finnes fra før'}), 400
-    ny_bok = Bok(
-        tittel=data['tittel'],
-        forfatter=data['forfatter'],
-        isbn=data['isbn'],
-        nummer=data['nummer']
-    )
-    db.session.add(ny_bok)
-    db.session.commit()
-    return jsonify({'resultat': f"{data['tittel']} ble registrert"})
+    try:
+        tittel = request.get_json()["tittel"]
+        forfatter = request.get_json()["forfatter"]
+        isbn = request.get_json()["isbn"]
+        nummer = request.get_json()["nummer"]
+        cur.execute("SELECT * FROM bøker WHERE tittel IS NULL")
+        space = cur.fetchone()
+        if space is None:
+            return{"melding": "det er ikke plass til flere bøker"}, 409
+        cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer,))
+        book = cur.fetchone
+        if book[0] is not None:
+            return{"melding": "boken finnes fra før"},409
+        cur.execute("UPDATE bøker SET tittel = ?, forfatter = ?, isbn = ? WHERE nummer = ?",
+                    (tittel, forfatter, isbn, nummer)
+        )
+        con.commit()
+        return{"melding": f"{tittel}ble registrert"},200
+    except sqlite3.Error as e:
+        return{"error": str(e)},500
 
 
 if __name__ == '__main__':
