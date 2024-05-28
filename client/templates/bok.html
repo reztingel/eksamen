@@ -6,13 +6,13 @@
     <a href="{{ url_for('index') }}">Tilbake</a>
 </div>
 
-<div class="bok">
-    <h2>{{bok.tittel}}</h2>
-    <p>{{bok.forfatter}}</p>
-    <p>boknummer: {{bok.nummer}}</p>
-    <p>ISBN: {{bok.isbn}}</p>
-    <img src="{{ url_for('static', filename='barcode/' + bok.nummer + '.png') }}" alt="barcode for bok: {{bok.nummer}}">
-    <form action="{{ url_for('slettbok', nummer=bok.nummer) }}" method="post">
+<div class="book">
+    <h2>{{bkok.tittel}}</h2>
+    <p>{{book.forfatter}}</p>
+    <p>bkknummer: {{bkok.nummer}}</p>
+    <p>ISBN: {{book.isbn}}</p>
+    <img src="{{ url_for('static', filename='barcode' + book.nummer + '.png') }}" alt="barcode for book: {{book.nummer}}">
+    <form action="{{ url_for('slettbkok', nummer=book.nummer) }}" method="post">
         <input type="submit" value="Slett">
     </form>
 </div>

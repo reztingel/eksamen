@@ -16,20 +16,20 @@ def index():
     return render_template("index.html", bøker=response.json())
 
 
-@app.route("/bok/<int:nummer>", methods=["GET"])
-def bok(nummer):
+@app.route("/book/<int:nummer>", methods=["GET"])
+def book(nummer):
     if nummer == 0:
         nummer = request.args.get("nummer")
     if int(nummer) < 1 or int(nummer) > 51:
         return render_template(
-            "error.html", error="Bok nummer utenfor rekkevidden", status=404
+            "error.html", error="Book nummer utenfor rekkevidden", status=404
         )
-    response = requests.get("http://127.0.0.1:5010/bok/" + str(nummer))
+    response = requests.get("http://127.0.0.1:5010/book/" + str(nummer))
     if response.status_code == 500 or response.status_code == 404:
         return render_template(
             "error.html", error=response.json()["error"], status=response.status_code
         )
-    return render_template("bok.html", bok=response.json())
+    return render_template("book.html", book=response.json())
 
 
 @app.route("/barcode/<nummer>", methods=["GET"])
@@ -57,9 +57,9 @@ def filter():
     return render_template("index.html", bøker=response.json(), streng=streng)
 
 
-@app.route("/slettbok/<nummer>", methods=["POST"])
-def slettbok(nummer):
-    response = requests.delete("http://127.0.0.1:5010/slettbok/" + nummer)
+@app.route("/slettbook/<nummer>", methods=["POST"])
+def slettbook(nummer):
+    response = requests.delete("http://127.0.0.1:5010/slettbook/" + nummer)
     if response.status_code == 500 or response.status_code == 404:
         return render_template(
             "error.html", error=response.json()["error"], status=response.status_code
@@ -67,10 +67,10 @@ def slettbok(nummer):
     return redirect("/")
 
 
-@app.route("/leggtilbok", methods=["GET", "POST"])
-def leggtilbok():
+@app.route("/leggtilbook", methods=["GET", "POST"])
+def leggtilbook():
     if request.method == "GET":
-        return render_template("leggtilbok.html")
+        return render_template("leggtilbook.html")
 
     if request.method == "POST":
         tittel = request.form.get("tittel")
@@ -80,7 +80,7 @@ def leggtilbok():
         if nummer == "":
             nummer = 0
         response = requests.post(
-            "http://127.0.0.1:5010/leggtilbok",
+            "http://127.0.0.1:5010/leggtilbook",
             json={
                 "tittel": tittel,
                 "forfatter": forfatter,

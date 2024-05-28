@@ -15,14 +15,14 @@ def index():
         cur.execute("SELECT * from bøker")
         bøker = cur.fetchall()
         response = []
-        for bok in bøker:
-            if bok[0] is not None:
+        for book in bøker:
+            if book[0] is not None:
                 response.append(
                     {
-                        "tittel": bok[0],
-                        "forfatter": bok[1],
-                        "isbn": bok[2],
-                        "nummer": bok[3],
+                        "tittel": book[0],
+                        "forfatter": book[1],
+                        "isbn": book[2],
+                        "nummer": book[3],
                     }
                 )
         return response, 200
@@ -30,17 +30,17 @@ def index():
         return {"error": str(e)}, 500
 
 
-@app.route("/bok/<nummer>", methods=["GET"])
-def bok(nummer):
+@app.route("/book/<nummer>", methods=["GET"])
+def book(nummer):
     try:
         cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer,))
-        bok = cur.fetchone()
-        if bok[0] is None:
+        book = cur.fetchone()
+        if book[0] is None:
             return {"error": "Fant ikke bok"}, 404
         response = {
-            "tittel": bok[0],
-            "forfatter": bok[1],
-            "isbn": bok[2],
+            "tittel": book[0],
+            "forfatter": book[1],
+            "isbn": book[2],
             "nummer": nummer,
         }
         return response, 200
@@ -60,13 +60,13 @@ def filter(streng):
         if not bøker:
             return {"error": f"Fant ingen bøker etter søkerordet: {streng}"}, 404
         response = []
-        for bok in bøker:
+        for book in bøker:
             response.append(
                 {
-                    "tittel": bok[0],
-                    "forfatter": bok[1],
-                    "isbn": bok[2],
-                    "nummer": bok[3],
+                    "tittel": book[0],
+                    "forfatter": book[1],
+                    "isbn": book[2],
+                    "nummer": book[3],
                 }
             )
         return response, 200
@@ -74,8 +74,8 @@ def filter(streng):
         return {"error": str(e)}, 500
 
 
-@app.route("/slettbok/<nummer>", methods=["DELETE"])
-def slettbok(nummer):
+@app.route("/slettbook/<nummer>", methods=["DELETE"])
+def slettbook(nummer):
     try:
         cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer,))
         row = cur.fetchone()
@@ -91,8 +91,8 @@ def slettbok(nummer):
         return {"error": str(e)}, 500
 
 
-@app.route("/leggtilbok", methods=["POST"])
-def leggtilbok():
+@app.route("/leggtilbook", methods=["POST"])
+def leggtilbook():
     try:
         tittel = request.get_json()["tittel"]
         forfatter = request.get_json()["forfatter"]
@@ -103,8 +103,8 @@ def leggtilbok():
         if plass is None:
             return {"error": "Det er ikke plass til flere bøker"}, 409
         cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer if nummer != 0 else plass[3],))
-        bok = cur.fetchone()
-        if bok[0] is not None:
+        book = cur.fetchone()
+        if book[0] is not None:
             return {"error": "Boken finnes fra før"}, 409
         if nummer == 0:
             cur.execute(
