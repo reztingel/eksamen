@@ -15,7 +15,7 @@ CORS(app)
 
 @app.route('/')
 def index():
-    response = requests.get('http://127.0.0.1:5001/')
+    response = requests.get('http://192.168.4.64/')
     return render_template('index.html', bøker=response.json())
 
 
@@ -23,7 +23,7 @@ def index():
 def book():
     nummer = request.args.get("nummer")
     print(nummer)
-    response = request.get("http://127.0.0.1:5001/book/" + str(nummer))
+    response = request.get("http://192.168.4.64/book/" + str(nummer))
     print(response.json())
     return render_template("book.html", book=response.json())
 
@@ -40,14 +40,14 @@ def barcode(nummer):
 @app.route('/filter', methods=['GET'])
 def filter():
     streng = request.args.get('streng')
-    response = requests.get("http://127.0.0.1:5001/filter/" + streng)
+    response = requests.get("http://192.168.4.64:/filter/" + streng)
     return render_template("index.html", bøker=response.json(), streng=streng)
 
 
 
 @app.route('/slettbook/<nummer>', methods=['POST'])
 def slettbook(nummer):
-    request.delete("http://127.0.0.1:5001/slettbook/" + nummer)
+    request.delete("http://192.168.4.64:/slettbook/" + nummer)
     return redirect("/")
     
 
@@ -60,7 +60,7 @@ def leggtilbook():
         forfatter = request.form.get("forfatter")
         isbn = request.form.get("isbn")
         nummer = request.form.get("nummer")
-        response = request.post("http://127.0.0.1:5001/leggtilbook",
+        response = request.post("http://192.168.4.64:/leggtilbook",
             json={
                 "tittel": tittel,
                 "forfatter": forfatter,
