@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bibliotek</title>
-  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   
@@ -12,8 +12,8 @@
         <a href="{{ url_for('index') }}">
             <h1>Mitt Bibliotek</h1>
         </a>
-        <form action="{{ url_for('book') }}" method="get">
-            <input type="number" name="nummer" id="nummer" placeholder="Scan bok">
+        <form action="{{ url_for('bok', nummer=0) }}" method="get" id="scan">
+            <input type="number" name="nummer" id="nummer" placeholder="Scan bok" size="50%" min="1" max="51" required>
         </form>
     </nav>
 

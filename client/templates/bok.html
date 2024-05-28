@@ -1,14 +1,20 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
 
-<h1>Bokdetaljer</h1>
-<div id="bokDetaljer">
-
+<div class="tilbake">
+    <a href="{{ url_for('index') }}">Tilbake</a>
 </div>
-<button onclick="slettBok()">Slett bok</button>
-<script src="{{ url_for(filename='js/main.js') }}"></script>
 
+<div class="bok">
+    <h2>{{bok.tittel}}</h2>
+    <p>{{bok.forfatter}}</p>
+    <p>boknummer: {{bok.nummer}}</p>
+    <p>ISBN: {{bok.isbn}}</p>
+    <img src="{{ url_for('static', filename='barcode/' + bok.nummer + '.png') }}" alt="barcode for bok: {{bok.nummer}}">
+    <form action="{{ url_for('slettbok', nummer=bok.nummer) }}" method="post">
+        <input type="submit" value="Slett">
+    </form>
+</div>
 
-
-{% enblock %}
+{% endblock %}

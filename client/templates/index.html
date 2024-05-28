@@ -1,27 +1,41 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
 
 <div class="topp">
     <h2>Bøker</h2>
-    <form action="{{ url_for('filter') }}" method="get">
-        <input type="text" name="streng" id="streng" placeholder="Søk etter bok eller forfatter" value="{{streng}}" required>
-        <input type="submit" value="Søk">
-    </form>
-    <form action="{{ url_for('leggtilbook') }}" method="get">
-        <input type="submit" value="Legg til book">
+    <div class="søk-container">
+        <form action="{{ url_for('filter') }}" method="get">
+            <input type="text" name="streng" id="streng" placeholder="Søk etter bok eller forfatter" value="{{streng}}">
+            <input type="submit" value="Søk">
+        </form>
+        {% if streng %}
+        <form action="{{ url_for('index') }}" method="get">
+            <input type="submit" value="Fjern filter">
+        </form>
+        {% endif %}
+    </div>
+    <form action="{{ url_for('leggtilbok') }}" method="get">
+        <input type="submit" name="leggtilbok" value="Legg til bok">
     </form>
 </div>
 
 <br>
 
-<ul>
-    {% for book in bøker %}
+{% if error %}
+<p class="error-melding">{{error}}</p>
+{% endif %}
+
+<ul class="bøker">
+    {% for bok in bøker %}
         <li>
-            <h3>{{book.tittel}}</h3>
-            <p>{{book.forfatter}}</p>
-            <p>{{book.nummer}}</p>
-            <form action="{{ url_for('slettbook', nummer=book.nummer) }}" method="post">
+            <a href="{{ url_for('bok', nummer=bok.nummer) }}">
+                <h3>{{bok.tittel}}</h3>
+                <p>{{bok.forfatter}}</p>
+                <p>{{bok.nummer}}</p>
+            </a>
+            <form action="{{ url_for('slettbok', nummer=bok.nummer) }}" method="post">
                 <input type="submit" value="Slett">
             </form>
         </li>
