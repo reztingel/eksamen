@@ -17,3 +17,9 @@ li {
     border: 1px solid #ccc;
     padding: 10px;
 }
+
+.bøker {
+    display: grid;
+    column-gap: 60px;
+    grid-template-columns: auto auto;
+}
