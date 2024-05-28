@@ -1,56 +1,46 @@
-from flask import Flask,request
+from flask import Flask, request
 from flask_cors import CORS
 import sqlite3
 
-
-
 app = Flask(__name__)
 CORS(app)
-
 
 con = sqlite3.Connection("C:/Users/tobia/Desktop/eksamen/bibliotek./database.db", check_same_thread=False)
 cur = con.cursor()
 
 
-
-
-
-
-@app.route('/', methods=['GET'])
+@app.route("/", methods=["GET"])
 def index():
     try:
         cur.execute("SELECT * from bøker")
-        bøker = cur.fetchall
+        bøker = cur.fetchall()
         response = []
-        for book in bøker:
-            if book[0] is not None:
+        for bok in bøker:
+            if bok[0] is not None:
                 response.append(
                     {
-                        "tittel":book[0],
-                        "forfatter":book[1],
-                        "isbn":book[2],
-                        "nummer":book[3],
-                     }
+                        "tittel": bok[0],
+                        "forfatter": bok[1],
+                        "isbn": bok[2],
+                        "nummer": bok[3],
+                    }
                 )
         return response, 200
     except sqlite3.Error as e:
         return {"error": str(e)}, 500
 
 
-
-
-
-@app.route('/book/<nummer>', methods=['GET'])
-def get_book(nummer):
+@app.route("/bok/<nummer>", methods=["GET"])
+def bok(nummer):
     try:
-        cur.execute("SELECT * FROM bøker WHERe nummer = ?", (nummer,))
-        book = cur.fetchone()
-        if book[0] is None:
-            return {"error": "fant ikke boken"}, 404
+        cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer,))
+        bok = cur.fetchone()
+        if bok[0] is None:
+            return {"error": "Fant ikke bok"}, 404
         response = {
-            "tittel": book[0],
-            "forfatter": book[1],
-            "isbn": book[2],
+            "tittel": bok[0],
+            "forfatter": bok[1],
+            "isbn": bok[2],
             "nummer": nummer,
         }
         return response, 200
@@ -62,43 +52,47 @@ def get_book(nummer):
 def filter(streng):
     try:
 
-        cur.execute("SELECT * FROM bøker WHERE tittel LIKE ? OR forfatter LIKE ?",(f"%{streng}%", f"%{streng}%"),)
+        cur.execute(
+            "SELECT * FROM bøker WHERE tittel LIKE ? OR forfatter LIKE ?",
+            (f"%{streng}%", f"%{streng}%"),
+        )
         bøker = cur.fetchall()
         if not bøker:
-            return {"melding": f"Fant ingen bøker etter søkerordet: {streng}"}, 404
+            return {"error": f"Fant ingen bøker etter søkerordet: {streng}"}, 404
         response = []
-        for book in bøker:
+        for bok in bøker:
             response.append(
-                {"tittel": book[0],
-                "forfatter": book[1],
-                "isbn": book[2],
-                "nummer": book[3],
+                {
+                    "tittel": bok[0],
+                    "forfatter": bok[1],
+                    "isbn": bok[2],
+                    "nummer": bok[3],
                 }
             )
-        return response,200
+        return response, 200
     except sqlite3.Error as e:
-        return {"error": str(e)},500
+        return {"error": str(e)}, 500
 
-@app.route('/slettbook/<nummer>', methods=['DELETE'])
-def slettbook(nummer):
+
+@app.route("/slettbok/<nummer>", methods=["DELETE"])
+def slettbok(nummer):
     try:
-        cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer))
+        cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer,))
         row = cur.fetchone()
         if row[0] is None:
-            return {"melding": "boke finnes ikke i databasen"}, 404
+            return {"error": "Boken finnes ikke i databasen"}, 404
         cur.execute(
             "UPDATE bøker SET tittel = NULL, forfatter = NULL, isbn = NULL WHERE nummer = ?",
             (nummer,),
         )
         con.commit()
-        return{"melding": "boken ble slettet fra databasen"}, 200
+        return {"melding": "Boken ble slettet fra databasen"}, 200
     except sqlite3.Error as e:
-        return{"error": str(e)},500
-    
+        return {"error": str(e)}, 500
 
 
-@app.route('/leggtilbok', methods=['POST'])
-def legg_til_bok():
+@app.route("/leggtilbok", methods=["POST"])
+def leggtilbok():
     try:
         tittel = request.get_json()["tittel"]
         forfatter = request.get_json()["forfatter"]
@@ -109,8 +103,8 @@ def legg_til_bok():
         if plass is None:
             return {"error": "Det er ikke plass til flere bøker"}, 409
         cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer if nummer != 0 else plass[3],))
-        book = cur.fetchone()
-        if book[0] is not None:
+        bok = cur.fetchone()
+        if bok[0] is not None:
             return {"error": "Boken finnes fra før"}, 409
         if nummer == 0:
             cur.execute(
@@ -128,6 +122,5 @@ def legg_til_bok():
         return {"error": str(e)}, 500
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True, port=5010)
