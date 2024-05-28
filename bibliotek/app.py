@@ -1,50 +1,59 @@
-from flask import Flask,request,jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask,request
+from flask_cors import CORS
+import sqlite3
+
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-db = SQLAlchemy(app)
+CORS(app)
 
 
-class Bok(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    tittel = db.Column(db.String(120), nullable=False)
-    forfatter = db.Column(db.String(120), nullable=False)
-    isbn = db.Column(db.String(13), nullable=False)
-    nummer = db.Column(db.Integer, unique=True, nullable=False)
+con = sqlite3.Connection("./database.db", check_same_thread=False)
+cur = con.cursor()
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'Tittel': self.tittel,
-            'Forfatter': self.forfatter,
-            'nummer': self.nummer,
-            'ISBN': self.isbn
-        }
-    
-with app.app_context():
-    db.create_all()
+
+
 
 
 
 @app.route('/', methods=['GET'])
-def get_boker():
-    boker = Bok.query.all()
-    return jsonify([bok.to_dict() for bok in boker])
+def index():
+    try:
+        cur.execute("SELECT * from bøker")
+        bøker = cur.fetchall
+        response = []
+        for book in bøker:
+            if book[0] is not None:
+                response.append(
+                    {"tittel":book[0],
+                     "forfatter":book[1],
+                     "isbn":book[2],
+                     "nummer":book[3]
+                     }
+                )
+        return response, 200
+    except sqlite3.Error as e:
+        return {"error": str(e)}, 500
 
-@app.route('/bok/<int:nummer>', methods=['GET'])
-def get_bok(nummer):
-    bok = Bok.query.filter_by(nummer=nummer).first()
-    if bok:
-        return jsonify(bok.to_dict())
+
+
+
+
+@app.route('/book/<nummer>', methods=['GET'])
+def get_book(nummer):
+    book = Bok.query.filter_by(nummer=nummer).first()
+    if book:
+        return jsonify(book.to_dict())
     else:
-        return jsonify({'resultat': 'Boken finnes ikke i databasen'}), 404
+        return jsonify({'error': 'Book not found'}), 404
+
+
 
 @app.route('/filter/<string:streng>', methods=['GET'])
 def filter_boker(streng):
     boker = Bok.query.filter((Bok.tittel.contains(streng)) | (Bok.forfatter.contains(streng))).all()
     return jsonify([bok.to_dict() for bok in boker])
+
 
 @app.route('/slettbok/<int:nummer>', methods=['DELETE'])
 def delete_bok(nummer):
@@ -55,6 +64,7 @@ def delete_bok(nummer):
         return jsonify({'resultat': 'Boken ble slettet fra databasen'})
     else:
         return jsonify({'resultat': 'Boken finnes ikke i databasen'}), 404
+
 
 @app.route('/leggtilbok', methods=['POST'])
 def legg_til_bok():
@@ -71,6 +81,7 @@ def legg_til_bok():
     db.session.add(ny_bok)
     db.session.commit()
     return jsonify({'resultat': f"{data['tittel']} ble registrert"})
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
