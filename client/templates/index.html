@@ -1,18 +1,31 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<h1>Bibliotek</h1>
-<div>
-    <input type="text" id="sokInput" placeholder="Søk etter tittel eller forfatter...">
-    <button onclick="sokBoker()">Søk</button>
-</div>
-<div>
-    <h2>Bøker</h2>
-    <ul id="bokListe">
-       
-    </ul>
-</div>
-<script src="{{ url_for(filename='js/main.js') }}"></script>
 
+<div class="topp">
+    <h2>Bøker</h2>
+    <form action="{{ url_for('filter') }}" method="get">
+        <input type="text" name="streng" id="streng" placeholder="Søk etter bok eller forfatter" value="{{streng}}" required>
+        <input type="submit" value="Søk">
+    </form>
+    <form action="{{ url_for('leggtilbook') }}" method="get">
+        <input type="submit" value="Legg til book">
+    </form>
+</div>
+
+<br>
+
+<ul>
+    {% for book in bøker %}
+        <li>
+            <h3>{{book.tittel}}</h3>
+            <p>{{book.forfatter}}</p>
+            <p>{{book.nummer}}</p>
+            <form action="{{ url_for('slettbook', nummer=book.nummer) }}" method="post">
+                <input type="submit" value="Slett">
+            </form>
+        </li>
+    {% endfor %}
+</ul>
 
 {% endblock %}
