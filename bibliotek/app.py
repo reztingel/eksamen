@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-con = sqlite3.Connection("./database.db", check_same_thread=False)
+con = sqlite3.Connection("C:/Users/tobia/Desktop/eksamen/bibliotek./database.db", check_same_thread=False)
 cur = con.cursor()
 
 
@@ -25,10 +25,11 @@ def index():
         for book in bøker:
             if book[0] is not None:
                 response.append(
-                    {"tittel":book[0],
-                     "forfatter":book[1],
-                     "isbn":book[2],
-                     "nummer":book[3]
+                    {
+                        "tittel":book[0],
+                        "forfatter":book[1],
+                        "isbn":book[2],
+                        "nummer":book[3],
                      }
                 )
         return response, 200
@@ -50,7 +51,7 @@ def get_book(nummer):
             "tittel": book[0],
             "forfatter": book[1],
             "isbn": book[2],
-            "nummer": nummer
+            "nummer": nummer,
         }
         return response, 200
     except sqlite3.Error as e:
@@ -71,22 +72,23 @@ def filter(streng):
                 {"tittel": book[0],
                 "forfatter": book[1],
                 "isbn": book[2],
-                "nummer": book[3]
+                "nummer": book[3],
                 }
             )
         return response,200
     except sqlite3.Error as e:
         return {"error": str(e)},500
 
-@app.route('/slettbook/<int:nummer>', methods=['DELETE'])
+@app.route('/slettbook/<nummer>', methods=['DELETE'])
 def slettbook(nummer):
     try:
         cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer))
         row = cur.fetchone()
         if row[0] is None:
             return {"melding": "boke finnes ikke i databasen"}, 404
-        cur.execute("UPDATE bøker SET tittel = NULL, forfatter = NULL, isbn = NULL WHERE nummer = ?",
-                    (nummer,)
+        cur.execute(
+            "UPDATE bøker SET tittel = NULL, forfatter = NULL, isbn = NULL WHERE nummer = ?",
+            (nummer,),
         )
         con.commit()
         return{"melding": "boken ble slettet fra databasen"}, 200
@@ -103,21 +105,29 @@ def legg_til_bok():
         isbn = request.get_json()["isbn"]
         nummer = request.get_json()["nummer"]
         cur.execute("SELECT * FROM bøker WHERE tittel IS NULL")
-        space = cur.fetchone()
-        if space is None:
-            return{"melding": "det er ikke plass til flere bøker"}, 409
-        cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer,))
-        book = cur.fetchone
+        plass = cur.fetchone()
+        if plass is None:
+            return {"error": "Det er ikke plass til flere bøker"}, 409
+        cur.execute("SELECT * FROM bøker WHERE nummer = ?", (nummer if nummer != 0 else plass[3],))
+        book = cur.fetchone()
         if book[0] is not None:
-            return{"melding": "boken finnes fra før"},409
-        cur.execute("UPDATE bøker SET tittel = ?, forfatter = ?, isbn = ? WHERE nummer = ?",
-                    (tittel, forfatter, isbn, nummer)
-        )
+            return {"error": "Boken finnes fra før"}, 409
+        if nummer == 0:
+            cur.execute(
+            "UPDATE bøker SET tittel = ?, forfatter = ?, isbn = ? WHERE nummer = ?",
+            (tittel, forfatter, isbn, plass[3]),
+            )
+        else:
+            cur.execute(
+                "UPDATE bøker SET tittel = ?, forfatter = ?, isbn = ? WHERE nummer = ?",
+                (tittel, forfatter, isbn, nummer),
+            )
         con.commit()
-        return{"melding": f"{tittel}ble registrert"},200
+        return {"melding": f"{tittel} ble registrert"}, 200
     except sqlite3.Error as e:
-        return{"error": str(e)},500
+        return {"error": str(e)}, 500
+
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5010)
